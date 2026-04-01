@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Inventory</title>
+        <style>
+            body {
+                background-color: black;
+            }
+
+            #inventory {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                grid-template-rows: repeat(5, 1fr);
+                gap: 10px;
+                width: 100%;
+                height: 80vh;
+                border: 2px solid white;
+                padding: 5px;
+                background-color: #333;
+            }
+
+            .slot {
+            	  display: flex;
+            	  align-items: center;
+            	  justify-content: center;
+                border: 2px solid white;
+            }
+
+            button {
+                background-color: #333;
+                border: none;
+                color: #777;
+                border-radius: 2vh;
+                width: 100%;
+                height: 10vh;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="inventory"></div>
+
+        <button onclick="pickUpItem('apple')">Pick up apple</button>
+
+        <script>
+            const itemDataBase = {
+                apple: {
+                    name: 'apple',
+                    icon: '🍎',
+                    weight: 0.2
+                },
+
+                phone: {
+                    name: 'smartphone',
+                    icon: '📱',
+                    weight: 0.2
+                }
+            } 
+
+            let backpack = new Array(25).fill(null);
+
+            function findFreeSlot() {
+                for (let slot = 0; slot < backpack.length; slot++) {
+                    if (backpack[slot] === null) {
+                        console.log("Free slot: " + slot);
+                        return slot;
+                    }
+
+                }
+                console.log("No free slot!");
+                return -1;
+            }
+
+            const container = document.getElementById('inventory');
+
+            function drawInventory() {
+            	container.innerHTML = "";
+                for (let i = 0; i < 25; i++) {
+                    let slot = document.createElement('div');
+                    slot.classList.add('slot');
+                    //slot.innerText = i;
+
+                    if (backpack[i] !== null) {
+                        slot.innerText = backpack[i].icon;
+                    }
+                    container.appendChild(slot);
+                    slot.onclick = () => removeItem(i);
+                }
+            }
+
+            function pickUpItem(itemKey) {
+                let freeSlot = findFreeSlot();
+
+                if (freeSlot !== -1) {
+                    let itemData = itemDataBase[itemKey];
+                    backpack[freeSlot] = itemData;
+                    drawInventory();
+                } else {
+                    alert("No free slot!");
+                }
+            }
+            
+            function removeItem(index) {
+                backpack[index] = null;
+                drawInventory();
+            }
+            
+            drawInventory();
+        </script>
+    </body>
+</html>
