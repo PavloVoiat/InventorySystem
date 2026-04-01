@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Inventory</title>
+        <style>
+            body {
+                background-color: black;
+            }
+
+            #inventory {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                grid-template-rows: repeat(5, 1fr);
+                gap: 10px;
+                width: 100%;
+                height: 80vh;
+                border: 2px solid white;
+                padding: 5px;
+                background-color: #333;
+            }
+
+            .slot {
+            	  display: flex;
+            	  align-items: center;
+            	  justify-content: center;
+                border: 2px solid white;
+            }
+
+            button {
+                background-color: #333;
+                border: none;
+                color: white;
+                border-radius: 2vh;
+                width: 32%;
+                height: 7vh;
+                font-weight: bold;
+            }
+
+            p {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #333;
+                border: none;
+                color: white;
+                border-radius: 2vh;
+                width: 100%;
+                height: 5vh;
+                font-weight: bold;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="inventory"></div>
+
+        <p>Total weight:&nbsp;<span id="weight-display">0</span>&nbsp;/ 5 кг</p>
+
+        <button onclick="pickUpItem('apple')">Pick up apple</button>
+        <button onclick="pickUpItem('phone')">Pick up smartphone</button>
+        <button onclick="pickUpItem('water')">Pick up water</button>
+
+        <script>
+            const itemDataBase = {
+                apple: {
+                    name: 'apple',
+                    icon: '🍎',
+                    weight: 0.2
+                },
+
+                phone: {
+                    name: 'smartphone',
+                    icon: '📱',
+                    weight: 0.2
+                },
+
+                water: {
+                    name: 'water',
+                    icon: '💧',
+                    weight: 0.75
+                }
+            } 
+
+            let backpack = new Array(25).fill(null);
+
+            function findFreeSlot() {
+                for (let slot = 0; slot < backpack.length; slot++) {
+                    if (backpack[slot] === null) {
+                        console.log("Free slot: " + slot);
+                        return slot;
+                    }
+
+                }
+                console.log("No free slot!");
+                return -1;
+            }
+
+            function drawInventory() {
+                const container = document.getElementById('inventory');
+                const weightDisplay = document.getElementById('weight-display');
+                container.innerHTML = "";
+
+                let totalWeight = 0;
+            	
+                for (let i = 0; i < backpack.length; i++) {
+                    const item = backpack[i]
+                    let slot = document.createElement('div');
+                    slot.classList.add('slot');
+                    //slot.innerText = i;
+
+                    if (item !== null) {
+                        slot.innerText = item.icon;
+                        totalWeight += item.weight;
+
+                        slot.onclick = () => removeItem(i);
+                    }
+                    container.appendChild(slot);
+                }
+                weightDisplay.innerText = totalWeight.toFixed(1);
+                if (totalWeight.toFixed(1) >= maxWeight) {
+                    weightDisplay.style.color = "red";
+                } else if (totalWeight.toFixed(1) >= maxWeight * 0.8) {
+                    weightDisplay.style.color = "orange";
+                } else {
+                    weightDisplay.style.color = "white";
+                }
+            }
+            
+            const maxWeight = 5.0;
+
+            function pickUpItem(itemKey) {
+                const itemData = itemDataBase[itemKey];
+
+                let freeSlot = findFreeSlot();
+                if (freeSlot === -1) {    
+                    alert("No free slot!");
+                    return;
+                }
+
+                let currentWeight = 0;
+                for (let item of backpack) {
+                    if (item !== null) currentWeight += item.weight;
+                }
+
+                if ((Number(currentWeight + itemData.weight).toFixed(1)) > maxWeight) {
+                    alert("Too heavy!");
+                    return;
+                }
+
+                backpack[freeSlot] = itemData;
+                drawInventory();                
+            }
+            
+            function removeItem(index) {
+                backpack[index] = null;
+                drawInventory();
+            }
+            
+            drawInventory();
+        </script>
+    </body>
+</html>
